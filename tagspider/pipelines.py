@@ -22,9 +22,10 @@ class PostgresPipeline:
     def process_item(self, item, spider):
         self.cur.execute(
             """\
-        insert into certificates (uuid, category_name, year, brand_name, set_name, card_name, variation, certificate_value, tag_grade)
-        values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        on conflict (uuid) do nothing""",
+        insert into certificates (uuid, category_name, year, brand_name, set_name, card_name, card_number, variation, certificate_value, tag_grade)
+        values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        on conflict (uuid) do update set (category_name, year, brand_name, set_name, card_name, card_number, variation, certificate_value, tag_grade) =
+        (excluded.category_name, excluded.year, excluded.brand_name, excluded.set_name, excluded.card_name, excluded.card_number, excluded.variation, excluded.certificate_value, excluded.tag_grade)""",
             (
                 item["uuid"],
                 item["category_name"],
@@ -32,6 +33,7 @@ class PostgresPipeline:
                 item["brand_name"],
                 item["set_name"],
                 item["card_name"],
+                item["card_number"],
                 item["variation"],
                 item["certificate_value"],
                 item["tag_grade"],
